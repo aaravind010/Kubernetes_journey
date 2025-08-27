@@ -1,0 +1,29 @@
+# nginx-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vproapp-nginx-ingress
+  namespace: vprofile
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+      - kubevpro.haraapp.shop
+      secretName: vprofile-tls
+
+  ingressClassName: nginx # Ensure you have the NGINX Ingress Controller installed
+  rules:
+  - host: kubevpro.haraapp.shop # Replace with your desired hostname
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vproapp-service
+            port:
+              number: 8080

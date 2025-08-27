@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vprodb-deployment
+  namespace: vprofile
+  labels:
+    app: vprodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vprodb
+  template:
+    metadata:
+      labels:
+        app: vprodb
+    spec:
+      containers:
+      - name: vprodb
+        image: aaravind010/vprofiledb
+        ports:
+        - name: vprodb-port
+          containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vpro-secret
+              key: db-pass
+        volumeMounts:
+        - name: vprodb-volume
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: vprodb-volume
+        persistentVolumeClaim:
+          claimName: vprodb-pvc
+      
+      initContainers:
+      - name: init-vprodb-volumeclear
+        image: busybox:latest
+        command:
+        - sh
+        - -c
+        - |
+          echo "Clearing all the content in /var/lib/mysql"
+          rm -rf /var/lib/mysql/*
+        
+        volumeMounts:
+        - name: vprodb-volume
+          mountPath: /var/lib/mysql
