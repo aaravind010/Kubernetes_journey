@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 2048-deployment
+  namespace: game-2048
+  labels:
+    app: gameapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gameapp
+  template:
+    metadata:
+      labels:
+        app: gameapp
+    spec:
+      containers:
+      - name: gameapp
+        image: public.ecr.aws/kishorj/docker-2048:latest
+        ports:
+        - name: gameapp-port
+          containerPort: 80
+        resources:
+          requests:
+            cpu: "5m"         # 0.5 CPU core
+            memory: "128Mi"     # 128 Mebibytes of memory
+          limits:
+            cpu: "6m"         # 1. CPU core
+            memory: "256Mi"     # 256 Mebibytes of memory
+
+
